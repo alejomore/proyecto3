@@ -12,7 +12,15 @@ router = APIRouter(
 # ==============================
 @router.get("/")
 def obtener_clientes():
-    data = supabase.table("clientes").select("*").execute()
+
+    data = (
+        supabase
+        .table("clientes")
+        .select("*")
+        .eq("activo", True)
+        .execute()
+    )
+
     return data.data
 
 
@@ -27,6 +35,7 @@ def obtener_cliente(cliente_id: int):
         .table("clientes")
         .select("*")
         .eq("id", cliente_id)
+        .eq("activo", True)
         .execute()
     )
 
@@ -45,7 +54,10 @@ def obtener_cliente(cliente_id: int):
 @router.post("/", status_code=status.HTTP_201_CREATED)
 def crear_cliente(cliente: Cliente):
 
-    datos = cliente.model_dump(exclude={"id", "created_at"})
+    datos = cliente.model_dump(
+        exclude={"id", "created_at", "activo"},
+        mode="json"
+    )
 
     data = (
         supabase
@@ -68,6 +80,7 @@ def actualizar_cliente(cliente_id: int, cliente: Cliente):
         .table("clientes")
         .select("*")
         .eq("id", cliente_id)
+        .eq("activo", True)
         .execute()
     )
 
@@ -77,7 +90,10 @@ def actualizar_cliente(cliente_id: int, cliente: Cliente):
             detail="Cliente no encontrado."
         )
 
-    datos = cliente.model_dump(exclude={"id", "created_at"})
+    datos = cliente.model_dump(
+        exclude={"id", "created_at", "activo"},
+        mode="json"
+    )
 
     data = (
         supabase
@@ -91,7 +107,7 @@ def actualizar_cliente(cliente_id: int, cliente: Cliente):
 
 
 # ==============================
-# Eliminar cliente
+# Eliminar cliente (Soft Delete)
 # ==============================
 @router.delete("/{cliente_id}")
 def eliminar_cliente(cliente_id: int):
@@ -101,6 +117,7 @@ def eliminar_cliente(cliente_id: int):
         .table("clientes")
         .select("id")
         .eq("id", cliente_id)
+        .eq("activo", True)
         .execute()
     )
 
@@ -113,7 +130,7 @@ def eliminar_cliente(cliente_id: int):
     (
         supabase
         .table("clientes")
-        .delete()
+        .update({"activo": False})
         .eq("id", cliente_id)
         .execute()
     )

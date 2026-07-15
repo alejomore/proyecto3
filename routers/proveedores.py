@@ -17,6 +17,7 @@ def obtener_proveedores():
         supabase
         .table("proveedores")
         .select("*")
+        .eq("activo", True)
         .execute()
     )
 
@@ -34,6 +35,7 @@ def obtener_proveedor(proveedor_id: int):
         .table("proveedores")
         .select("*")
         .eq("id", proveedor_id)
+        .eq("activo", True)
         .execute()
     )
 
@@ -52,7 +54,10 @@ def obtener_proveedor(proveedor_id: int):
 @router.post("/", status_code=status.HTTP_201_CREATED)
 def crear_proveedor(proveedor: Proveedor):
 
-    datos = proveedor.model_dump(exclude={"id", "created_at"})
+    datos = proveedor.model_dump(
+        exclude={"id", "created_at", "activo"},
+        mode="json"
+    )
 
     data = (
         supabase
@@ -75,6 +80,7 @@ def actualizar_proveedor(proveedor_id: int, proveedor: Proveedor):
         .table("proveedores")
         .select("*")
         .eq("id", proveedor_id)
+        .eq("activo", True)
         .execute()
     )
 
@@ -84,7 +90,10 @@ def actualizar_proveedor(proveedor_id: int, proveedor: Proveedor):
             detail="Proveedor no encontrado."
         )
 
-    datos = proveedor.model_dump(exclude={"id", "created_at"})
+    datos = proveedor.model_dump(
+        exclude={"id", "created_at", "activo"},
+        mode="json"
+    )
 
     data = (
         supabase
@@ -98,7 +107,7 @@ def actualizar_proveedor(proveedor_id: int, proveedor: Proveedor):
 
 
 # ==============================
-# Eliminar proveedor
+# Eliminar proveedor (Soft Delete)
 # ==============================
 @router.delete("/{proveedor_id}")
 def eliminar_proveedor(proveedor_id: int):
@@ -108,6 +117,7 @@ def eliminar_proveedor(proveedor_id: int):
         .table("proveedores")
         .select("id")
         .eq("id", proveedor_id)
+        .eq("activo", True)
         .execute()
     )
 
@@ -120,7 +130,7 @@ def eliminar_proveedor(proveedor_id: int):
     (
         supabase
         .table("proveedores")
-        .delete()
+        .update({"activo": False})
         .eq("id", proveedor_id)
         .execute()
     )

@@ -7,3 +7,4 @@ class Usuario(BaseModel):
     password: str
     rol_id: int
     created_at: str | None = None
+    activo: bool | None = None

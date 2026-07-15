@@ -12,7 +12,15 @@ router = APIRouter(
 # ==============================
 @router.get("/")
 def obtener_productos():
-    data = supabase.table("productos").select("*").execute()
+
+    data = (
+        supabase
+        .table("productos")
+        .select("*")
+        .eq("activo", True)
+        .execute()
+    )
+
     return data.data
 
 
@@ -27,6 +35,7 @@ def obtener_producto(producto_id: int):
         .table("productos")
         .select("*")
         .eq("id", producto_id)
+        .eq("activo", True)
         .execute()
     )
 
@@ -45,7 +54,10 @@ def obtener_producto(producto_id: int):
 @router.post("/", status_code=status.HTTP_201_CREATED)
 def crear_producto(producto: Producto):
 
-    datos = producto.model_dump(exclude={"id", "created_at"})
+    datos = producto.model_dump(
+        exclude={"id", "created_at"},
+        mode="json"
+    )
 
     data = (
         supabase
@@ -68,6 +80,7 @@ def actualizar_producto(producto_id: int, producto: Producto):
         .table("productos")
         .select("*")
         .eq("id", producto_id)
+        .eq("activo", True)
         .execute()
     )
 
@@ -77,7 +90,10 @@ def actualizar_producto(producto_id: int, producto: Producto):
             detail="Producto no encontrado."
         )
 
-    datos = producto.model_dump(exclude={"id", "created_at"})
+    datos = producto.model_dump(
+        exclude={"id", "created_at", "activo"},
+        mode="json"
+    )
 
     data = (
         supabase
@@ -91,7 +107,7 @@ def actualizar_producto(producto_id: int, producto: Producto):
 
 
 # ==============================
-# Eliminar producto
+# Eliminar producto (Soft Delete)
 # ==============================
 @router.delete("/{producto_id}")
 def eliminar_producto(producto_id: int):
@@ -101,6 +117,7 @@ def eliminar_producto(producto_id: int):
         .table("productos")
         .select("id")
         .eq("id", producto_id)
+        .eq("activo", True)
         .execute()
     )
 
@@ -113,7 +130,7 @@ def eliminar_producto(producto_id: int):
     (
         supabase
         .table("productos")
-        .delete()
+        .update({"activo": False})
         .eq("id", producto_id)
         .execute()
     )

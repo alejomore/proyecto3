@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from pydantic import BaseModel
 
 class Inventario(BaseModel):
@@ -5,4 +7,5 @@ class Inventario(BaseModel):
     producto_id: int
     tipo_movimiento: str
     cantidad: float
-    fecha: str | None = None
+    fecha: datetime | None = None
+    activo: bool | None = None

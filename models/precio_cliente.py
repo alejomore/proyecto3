@@ -7,3 +7,4 @@ class PrecioCliente(BaseModel):
     cantidad_minima: float
     precio: float
     created_at: str | None = None
+    activo: bool | None = None

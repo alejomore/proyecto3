@@ -7,3 +7,4 @@ class Proveedor(BaseModel):
     correo: EmailStr | None = None
     direccion: str | None = None
     created_at: str | None = None
+    activo: bool | None = None

@@ -7,3 +7,4 @@ class Cliente(BaseModel):
     direccion: str | None = None
     tipo_cliente: str
     created_at: str | None = None
+    activo: bool | None = None

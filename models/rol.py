@@ -5,3 +5,4 @@ class Rol(BaseModel):
     nombre: str
     descripcion: str | None = None
     created_at: str | None = None
+    activo: bool | None = None 
